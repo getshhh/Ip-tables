@@ -1,0 +1,96 @@
+services:
+  wg-easy:
+    environment:
+      - WG_HOST=10.2.0.3
+      - PASSWORD_HASH=$$2y$$10$$hBCoykrB95WSzuV4fafBzOHWKu9sbyVa34GJr8VV5R/pIelfEMYyG
+      - WG_ALLOWED_IPS=10.8.0.0/2, 10.3.0.0/24
+      - WG_POST_UP=iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE;
+      - WG_POST_DOWN=iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth1 -j MASQUERADE;
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wg-easy
+    volumes:
+      - ./config:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      net_C:
+        ipv4_address: 10.3.0.3
+      net_B:
+        ipv4_address: 10.2.0.3
+
+  peer:
+    build: .
+    volumes:
+      - ./client_1_config:/etc/wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    privileged: true
+    tty: true
+    depends_on:
+      - wg-easy
+    container_name: peer
+    networks:
+      net_A:
+        ipv4_address: 10.1.0.70
+
+  gateway:
+    image: nicolaka/netshoot
+    container_name: gateway
+    networks:
+      net_A:
+        ipv4_address: 10.1.0.2
+      net_B:
+        ipv4_address: 10.2.0.2
+    tty: true
+    command: bash -c "
+      iptables -A FORWARD -i net_B -o net_C -s 10.2.0.0/24 -d 10.3.0.0/24 -j ACCEPT; 
+      iptables -A FORWARD -o net_C -d 10.3.0.0/24 -j REJECT; 
+      iptables -A FORWARD -i net_A -o net_C -j REJECT; 
+      tcpdump -C 1 -W 1 -w /data/gateway.pcap"
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./dump/:/data
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    networks:
+      net_C:
+        ipv4_address: 10.3.0.10
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+networks:
+  net_A:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.1.0.0/24
+          gateway: 10.1.0.1
+  net_B:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.2.0.0/24
+          gateway: 10.2.0.1
+  net_C:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.3.0.0/24
+          gateway: 10.3.0.1
