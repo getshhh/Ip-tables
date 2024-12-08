@@ -44,4 +44,4 @@
 - Установленные Docker и Docker Compose на вашем компьютере.
 
 ## Скрины о проделанной работе 
-(https://github.com/getshhh/Ip-tables/blob/main/photo_1_2024-12-08_16-36-35.jpg)
+![Описание изображения](images/photo_1_2024-12-08_16-36-35.jpg)
