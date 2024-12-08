@@ -44,4 +44,9 @@
 - Установленные Docker и Docker Compose на вашем компьютере.
 
 ## Скрины о проделанной работе 
-![Описание изображения](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_1_2024-12-08_16-36-35.jpg)
+![Скриншот 1](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_1_2024-12-08_16-36-35.jpg)
+![Скриншот 2](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_2_2024-12-08_16-36-35.jpg)
+![Скриншот 3](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_3_2024-12-08_16-36-35.jpg)
+![Скриншот 4](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_4_2024-12-08_16-36-35.jpg)
+![Скриншот 5](https://raw.githubusercontent.com/getshhh/Ip-tables/main/photo_5_2024-12-08_16-36-35.jpg)
+
